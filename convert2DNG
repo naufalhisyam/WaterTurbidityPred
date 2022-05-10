@@ -1,0 +1,152 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Untitled2.ipynb",
+      "provenance": [],
+      "authorship_tag": "ABX9TyMUuemZDOaGGmP3UyKlIDmY",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/naufalhisyam/TurbidityPrediction-thesis/blob/main/convert2DNG\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "BATCH CONVERT FROM DNG TO PNG"
+      ],
+      "metadata": {
+        "id": "II9Z7Azb5N3R"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from google.colab import drive\n",
+        "drive.mount('/content/gdrive')"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ktGjafTW5Vi3",
+        "outputId": "6b8413ac-4087-4b99-d5cb-24bfec0dfdee"
+      },
+      "execution_count": 1,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Mounted at /content/gdrive\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "krbxo01Qd_kM"
+      },
+      "outputs": [],
+      "source": [
+        "import os.path\n",
+        "import glob\n",
+        "import os\n",
+        "import rawpy\n",
+        "import imageio\n",
+        "import cv2\n",
+        "import numpy as np\n",
+        "import matplotlib.pyplot as plt\n",
+        "from skimage import exposure"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "path = \"/content/gdrive/MyDrive/colab_model/rocket/PPO\"\n",
+        "save_path = \"/content/hasil_convert\"\n",
+        "\n",
+        "if not os.path.exists(save_path):\n",
+        "  os.makedirs(save_path)"
+      ],
+      "metadata": {
+        "id": "sSXpeGqF5UUq"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "for file in glob.glob(path):\n",
+        "    print( \"file : \" + file)\n",
+        "    if infile[-3:] == \"tif\" or infile[-3:] == \"DNG\" :\n",
+        "       # print \"is tif or DNG (RAW)\"\n",
+        "       outfile = infile[:-3] + \"jpg\"\n",
+        "       raw = rawpy.imread(infile)\n",
+        "       print( \"new filename : \" + outfile)\n",
+        "       \n",
+        "       \n",
+        "       #rgb = raw.postprocess()\n",
+        "\n",
+        "\n",
+        "       \n",
+        "# Postprocessing, i.e demosaicing here, will always \n",
+        "#change the original pixel values. Typically what you want\n",
+        "# is to get a linearly postprocessed image so that roughly \n",
+        "#the number of photons are in linear relation to the pixel values. \n",
+        "#You can do that with:\n",
+        "\n",
+        "       rgb = raw.postprocess(gamma=(1,1), no_auto_bright=True, output_bps=8)\n",
+        "       \n",
+        "       # in python image processing an image is considered as a matrix. \n",
+        "       # the simplest way to represent it is using a numpy.array type, as shown below:       \n",
+        "       \n",
+        "      \n",
+        "       \n",
+        "       #Apply gamma corrections: gamma values greater than 1 will shift the image histogram towards left and the output image will be darker than the input image. On the other hand, for gamma values less than 1, the histogram will shift towards right and the output image will be brighter than the input image.\n",
+        "  \n",
+        "       gamma_corrected_rgb = exposure.adjust_gamma(rgb, gamma=0.5, gain=1)\n",
+        "\n",
+        "       \n",
+        "       image=gamma_corrected_rgb\n",
+        "  \n",
+        "      \n",
+        "       #apply histogram equalization\n",
+        "       #using skimage (easy way)\n",
+        "       hist_equalized = exposure.equalize_hist(image)\n",
+        "\n",
+        "\n",
+        "           \n",
+        "       #save images to working directory    \n",
+        "       imageio.imsave(outfile, hist_equalized)\n",
+        "       "
+      ],
+      "metadata": {
+        "id": "Ye8yQsvZzyyP"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
